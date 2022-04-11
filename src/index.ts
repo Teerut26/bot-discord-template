@@ -1,36 +1,36 @@
+import { Client, Collection, Intents } from "discord.js";
+import fs from "fs";
+import path from "path";
+import "./push_command"
 require("dotenv").config();
-import RegisterCommand from "./register-command";
-const { Client, Intents } = require("discord.js");
 
-class Bot {
-  private token = process.env.TOKEN;
-  private client: any;
-
-  constructor() {
-    this.client = new Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      ],
-    });
-    new RegisterCommand();
-    this.client.login(this.token);
-    this.client.on("ready", this.onReady);
-    this.client.on("interactionCreate", this.onInteraction);
-  }
-
-  onReady(client: any): void {
-    console.log(`Ready ${client.user.username}`);
-  }
-
-  async onInteraction(interaction: any): Promise<void> {
-    if (!interaction.isCommand()) return;
-
-    if (interaction.commandName === 'ping') {
-      await interaction.reply('Pong!');
+declare module "discord.js" {
+    export interface Client {
+        commands: Collection<unknown, any>;
     }
-  }
 }
 
-new Bot();
+const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+
+client.commands = new Collection();
+const commandFiles = fs.readdirSync(path.join(__dirname, "commands"));
+
+for (const file of commandFiles) {
+    const command = require(`${path.join(__dirname, "commands")}/${file}`);
+    client.commands.set(command.data.name, command);
+}
+
+const eventFiles = fs.readdirSync(path.join(__dirname, "events"));
+
+for (const file of eventFiles) {
+    const event = require(`${path.join(__dirname, "events")}/${file}`);
+    if (event.once) {
+        client.once(event.name, (...args) => event.execute(...args));
+    } else {
+        client.on(event.name, (...args) => event.execute(...args));
+    }
+}
+
+client.login(process.env.TOKEN);
+
+//ref https://github.com/manybaht/manybaht-music

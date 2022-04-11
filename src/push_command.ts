@@ -30,7 +30,7 @@ const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
         } else if (process.env.NODE_ENV === "production") {
             console.log("production");
             await rest.put(
-                Routes.applicationGuildCommands(process.env.CLIENT_ID),
+                Routes.applicationCommands(process.env.CLIENT_ID),
                 {
                     body: commands,
                 }

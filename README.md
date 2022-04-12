@@ -1,4 +1,4 @@
-##setup .env file
+## setup .env file
 
 ```
 CLIENT_ID=
@@ -7,17 +7,17 @@ TOKEN=
 NODE_ENV=development|production 
 ```
 
-##install dependencies
+## install dependencies
 ```
 npm i
 ```
 
-##run for devlopment
+## run for devlopment
 ```
 npm run dev
 ```
 
-##run build for production (.js file)
+## run build for production (.js file)
 ```
 npm run build
 ```
